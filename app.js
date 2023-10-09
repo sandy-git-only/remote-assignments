@@ -1,7 +1,9 @@
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
+const http = require('http')
 app.use(express.json())
+
 
 app.listen(3000);
 
@@ -25,10 +27,6 @@ connection.connect((err) => {
   console.log('Connected to MySQL database');
 });
 
-// app.get('/users', (req, res) => {
-//   res.send('Hello! This is the users page.');
-// });
-
 
 
 //User Sign Up API
@@ -48,7 +46,7 @@ app.post('/users', (req, res) => {
 
   const userName = requestData.name;
   const userEmail = requestData.email;
-  const requestDate = req.get('Date');
+  const requestDate = req.get('Request-Date');
   // console.log(requestDate)
 
   const checkEmailQuery = 'SELECT * FROM user WHERE email = ?';
@@ -71,7 +69,7 @@ app.post('/users', (req, res) => {
     connection.query(query, values, (error, results) => {
       if (error) {
         console.error('Error inserting user: ', error);
-        return res.status(400).json({ error: 'Client Error: Bad Request', details: error.message });
+        return res.status(400).json({ error: 'Client Error Response:', details: error.message });
       }
 
       const userObject = { 
@@ -84,7 +82,7 @@ app.post('/users', (req, res) => {
       const successResponse = {
         data: {
           user: userObject,
-          'request-date': requestDate,  // Get the current UTC date and time
+          'request-date': requestDate, 
         }
       };
       res.status(200).json({successResponse});
@@ -112,8 +110,8 @@ app.get('/users', (req, res) => {
       return res.status(403).json({ error: 'User Not Existing' });
     }
 
-    const requestDate = req.get('Date')
-    console.log(requestDate)
+    const requestDate = req.get('Request-Date')
+    // console.log(requestDate)
     const user = results[0];
     const userObject = {
       id: user.id,
